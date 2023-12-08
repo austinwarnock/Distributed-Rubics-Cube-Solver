@@ -1,0 +1,47 @@
+version: '3.9'
+services:
+  solver:
+    build: .
+    hostname: result
+    container_name: result
+    networks:
+      - default
+  'U':
+    build: .
+    hostname: 'U'
+    container_name: 'U'
+    networks:
+      - default
+  'D':
+    build: .
+    hostname: 'D'
+    container_name: 'D'
+    networks:
+      - default
+  'R':
+    build: .
+    hostname: 'R'
+    container_name: 'R'
+    networks:
+      - default    
+  'L':
+    build: .
+    hostname: 'L'
+    container_name: 'L'
+    networks:
+      - default    
+  'F':
+    build: .
+    hostname: 'F'
+    container_name: 'F'
+    networks:
+      - default   
+  'B':
+    build: .
+    hostname: 'B'
+    container_name: 'B'
+    networks:
+      - default   
+networks:
+  default:
+    driver: bridge
