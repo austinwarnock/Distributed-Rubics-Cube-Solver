@@ -1,0 +1,10 @@
+      G3|G6|G9
+      Y4|Y5|Y6
+      Y7|Y8|Y9
+Y1|B2|B3|R1|R2|R3|G1|G2|W7|O7|O4|O1
+Y2|B5|B6|R4|R5|R6|G4|G5|W8|O8|O5|O2
+Y3|B8|B9|R7|R8|R9|G7|G8|W9|O9|O6|O3
+      W1|W2|W3
+      W4|W5|W6
+      B1|B4|B7
+

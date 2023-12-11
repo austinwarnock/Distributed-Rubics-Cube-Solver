@@ -11,7 +11,7 @@ class Color(Enum):
 class Face:
     def __init__(self, color: Color):
         self.color = color
-        self.squares = [[color for _ in range(3)] for __ in range(3)]
+        self.squares = [[f"{color.value}{(r * 3) + c + 1}" for c in range(3)] for r in range(3)]
         
     def set_row(self, row: int, squares: list):
         if len(squares) != 3:
@@ -27,12 +27,25 @@ class Face:
             self.squares[i][column] = squares[i]
         
     def rotate(self, direction: str):
+        if len(self.squares) != 3 or len(self.squares[0]) != 3:
+            return "Input self.squares is not 3x3"
+
+        top = self.squares[0]
+        bottom = self.squares[2]
+        left = [row[0] for row in self.squares]
+        right = [row[2] for row in self.squares]
+
         if direction == "clockwise":
-            self.squares = list(zip(*self.squares[::-1]))
+            self.set_row(0, left[::-1])
+            self.set_column(2, top)
+            self.set_row(2, right[::-1])
+            self.set_column(0, bottom)
         elif direction == "counterclockwise":
-            self.squares = list(zip(*self.squares))[::-1]
-        else:
-            raise ValueError("direction must be either 'clockwise' or 'counterclockwise'")
+            self.set_row(0, right)
+            self.set_column(2, bottom[::-1])
+            self.set_row(2, left)
+            self.set_column(0, top[::-1])
+
         
     def get_row(self, row: int):
         return self.squares[row]
@@ -41,7 +54,7 @@ class Face:
         return [row[column] for row in self.squares]
         
     def get_row_for_print(self, row: int):
-        return "|".join(s.value for s in self.squares[row])
+        return "|".join(s for s in self.squares[row])
         
         
     def __str__(self):
@@ -56,9 +69,10 @@ class Face:
     
 EDGE_ADJACENCY = {
     'U': [('F','r',0), 
-          ('R', 'r',0),
+          ('L', 'r',0),
           ('B', 'r',0),
-          ('L', 'r',0)],
+          ('R', 'r',0)
+          ],
     'L': [('U', 'c',0),
           ('F','c',0), 
           ('D', 'c',0),
@@ -71,10 +85,11 @@ EDGE_ADJACENCY = {
           ('U', 'c',2),
           ('B', 'c',0),
           ('D', 'c',2)],
-    'B': [('U','r',0), 
-          ('R', 'c',2),
-          ('D', 'r',2),
-          ('L', 'c',0)],
+    'B': [('U','r',0),
+          ('L', 'c',0),
+          ('D', 'r',2), 
+          ('R', 'c',2)
+          ],
     'D': [('F','r',2), 
           ('R', 'r',2),
           ('B', 'r',2),
@@ -86,37 +101,16 @@ class Cube:
     
     def __init__(self):
         self.faces = {
-            'U': Face(Color.WHITE),
-            'L': Face(Color.GREEN),
+            'U': Face(Color.YELLOW),
+            'L': Face(Color.BLUE),
             'F': Face(Color.RED),
-            'R': Face(Color.BLUE),
+            'R': Face(Color.GREEN),
             'B': Face(Color.ORANGE),
-            'D': Face(Color.YELLOW)
+            'D': Face(Color.WHITE)
         }
         
-    def update_adjacent_faces(self, face: str, direction:str):
-        lookup = EDGE_ADJACENCY[face]
-        if direction == "counterclockwise":
-            lookup = lookup[::-1]
+    def update_adjacent_faces(self, face: str, direction: str):
         
-        prev = []
-
-        for lookup_index, (adj_face, mod_type, index) in enumerate(lookup):
-            temp = []
-            if lookup_index == 0:
-                last_face = lookup[-1][0]
-                last_type = lookup[-1][1]
-                last_index = lookup[-1][2]
-                prev = self.faces[last_face].get_row(last_index) if last_type == 'r' else self.faces[last_face].get_column(last_index)
-            else:
-                last_face = lookup[lookup_index-1][0]
-                last_type = lookup[lookup_index-1][1]
-                last_index = lookup[lookup_index-1][2]    
-            
-            temp = self.faces[adj_face].get_row(index) if mod_type == 'r' else self.faces[adj_face].get_column(index)
-            self.faces[adj_face].set_row(index, prev) if mod_type == 'r' else self.faces[adj_face].set_column(index, prev)
-            
-            prev = temp
 
         
     def rotate(self, face: str, direction: str):
@@ -124,13 +118,18 @@ class Cube:
             raise ValueError("face must be one of 'U', 'L', 'F', 'R', 'B', 'D'")
         self.faces[face].rotate(direction)
         self.update_adjacent_faces(face, direction)
+
+    def print_move(self, face: str, direction: str):
+        print(f"{face}{'`' if direction == 'counterclockwise' else ''}")
         
     def scramble(self):
         from random import choice
-        for _ in range(100):
+        for _ in range(5):
             face = choice(list(self.faces.keys()))
             direction = choice(['clockwise', 'counterclockwise'])
+            self.print_move(face, direction)
             self.rotate(face, direction)
+            print(self.__str__())
         
     def __str__(self):
         # print the net of the cube
@@ -153,7 +152,22 @@ if __name__ == "__main__":
     c = Cube()
     print(c)
     
-    c.scramble()
+    for direction in ['clockwise', 'counterclockwise']:
+        for face in ['U', 'L', 'F', 'R', 'B', 'D']:
+            c = Cube()
+            file = open(f"tests/{face}-{direction}.txt", "w")
+            c.rotate(face, direction)
+            print(c, file=file)
+
+
+    #c.scramble()
+    # c.rotate('U', 'counterclockwise')
+    # print(c)
+    # c.rotate('D', 'clockwise')
+    # print(c)
+    # c.rotate('B', 'clockwise')
+    # print(c)
+    # c.rotate('R', 'counterclockwise')
 
     print(c)
 
