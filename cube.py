@@ -109,7 +109,102 @@ class Cube:
             'D': Face(Color.WHITE)
         }
         
+    def get_values(self, face_arr:list, index_arr:list, type_arr:list):
+        out = []
+        for face, idx, type in zip(face_arr, index_arr, type_arr):
+            if type == 'r':
+                out.append(self.faces[face].get_row(idx))
+            else:
+                out.append(self.faces[face].get_column(idx))
+        return self.shift_list(out)
+    
+    def set_values(self, face_arr:list, index_arr:list, type_arr:list, values:list):
+        for face, idx, type, value in zip(face_arr, index_arr, type_arr, values):
+            if type == 'r':
+                self.faces[face].set_row(idx, value)
+            else:
+                self.faces[face].set_column(idx, value)
+                
+    def shift_list(self, lst:list):
+        lst.insert(0, lst.pop())
+        return lst
+        
+    def rotate_x(self, move:str, direction: str): #U,D
+        type_lst = ['r','r','r','r']
+        if move == 'U':
+            faces = ['F','L','B','R']
+            idx_lst = [0,0,0,0]
+        else:
+            faces = ['F','R','B','L']
+            idx_lst = [2,2,2,2]
+            
+        if direction == 'counterclockwise':
+            faces = faces[::-1]
+            idx_lst = idx_lst[::-1]
+            type_lst = type_lst[::-1]
+            
+        values = self.get_values(faces, idx_lst, type_lst)
+        
+        self.set_values(faces, idx_lst, type_lst, values)
+    
+        
+    def rotate_y(self, move:str, direction: str): # L,R
+        type_lst = ['c','c','c','c']
+        flip_ids = [0,-1]
+        
+        if move == 'L': #B -> U, D-> B
+            faces = ['U','F','D','B']
+            idx_lst = [0,0,0,2]
+        else: #U -> B, B-> D
+            faces = ['D','F','U','B']
+            idx_lst = [2,2,2,0]
+            
+        if direction == 'counterclockwise':
+            faces = faces[::-1]
+            idx_lst = idx_lst[::-1]
+            type_lst = type_lst[::-1]
+            flip_ids = [-1,0]
+            
+        values = self.get_values(faces, idx_lst, type_lst)
+        values[flip_ids[0]] = values[0][::-1]
+        values[flip_ids[1]] = values[-1][::-1]         
+        self.set_values(faces, idx_lst, type_lst, values)
+        
+        
+    def rotate_z(self, move:str, direction: str): # F,B
+        type_lst = ['r','c','r','c']
+        
+        if move == 'F': #R -> D, L -> U
+            type_lst = ['r','c','r','c']
+            faces = ['U','R','D','L']
+            idx_lst = [2,0,0,2]
+        else: # D-R, U-L
+            type_lst = ['c','r','c','r']
+            faces = ['L','D','R','U']
+            idx_lst = [0,2,2,0]
+    
+        values = self.get_values(faces, idx_lst, type_lst)
+        values[0] = values[0][::-1]
+        values[2] = values[2][::-1]
+        
+        
+        self.set_values(faces, idx_lst, type_lst, values)
+
+
+        
     def update_adjacent_faces(self, face: str, direction: str):
+        if face not in self.faces.keys():
+            raise ValueError("face must be one of 'U', 'L', 'F', 'R', 'B', 'D'")
+        
+        if face == 'U' or face == 'D':
+            self.rotate_x(face, direction)
+        elif face == 'L' or face == 'R':
+            self.rotate_y(face, direction)
+        elif face == 'F' or face == 'B':
+            self.rotate_z(face, direction)
+        
+
+            
         
 
         
@@ -135,14 +230,14 @@ class Cube:
         # print the net of the cube
         out = ""
         for i in range(3):
-            out += "      " + str(self.faces['U'].get_row_for_print(i)) + "\n"
+            out += "         " + str(self.faces['U'].get_row_for_print(i)) + "\n"
         for i in range(3):
             out += str(self.faces['L'].get_row_for_print(i)) + "|"
             out += str(self.faces['F'].get_row_for_print(i)) + "|"
             out += str(self.faces['R'].get_row_for_print(i)) + "|"
             out += str(self.faces['B'].get_row_for_print(i)) + "\n"
         for i in range(3):
-            out += "      " + str(self.faces['D'].get_row_for_print(i)) + "\n"
+            out += "         " + str(self.faces['D'].get_row_for_print(i)) + "\n"
                 
 
         return out
