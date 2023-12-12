@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package austinrubiks;
+
+service RubiksMessaging {
+
+    rpc GetColumn(Index) returns (SquareTriple) {}
+
+    rpc GetRow(Index) returns (SquareTriple) {}
+
+    rpc SetColumn(Index, SquareTriple) returns (Ack) {}
+
+    rpc SetRow(Index, SquareTriple) returns (Ack) {}
+
+    rpc Rotate(Direction) returns (Ack) {}
+
+}
+
+enum Directions {
+    CLOCKWISE = 'clockwise';
+    COUNTERCLOCKWISE = 'counterclockwise';
+}
+
+message Index {
+    int32 index = 0;
+}
+
+
+
+message Ack {
+    int32 status = 1;
+}
