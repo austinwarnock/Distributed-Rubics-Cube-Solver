@@ -163,16 +163,17 @@ class Cube:
             faces = faces[::-1]
             idx_lst = idx_lst[::-1]
             type_lst = type_lst[::-1]
-            flip_ids = [-1,0]
+            flip_ids = [0,1]
             
         values = self.get_values(faces, idx_lst, type_lst)
-        values[flip_ids[0]] = values[0][::-1]
-        values[flip_ids[1]] = values[-1][::-1]         
+        for i in flip_ids:
+            values[i] = values[i][::-1]         
         self.set_values(faces, idx_lst, type_lst, values)
         
         
     def rotate_z(self, move:str, direction: str): # F,B
         type_lst = ['r','c','r','c']
+        flip_ids = [0,2]
         
         if move == 'F': #R -> D, L -> U
             type_lst = ['r','c','r','c']
@@ -182,11 +183,18 @@ class Cube:
             type_lst = ['c','r','c','r']
             faces = ['L','D','R','U']
             idx_lst = [0,2,2,0]
+            
+        if direction == 'counterclockwise':
+            faces = faces[::-1]
+            idx_lst = idx_lst[::-1]
+            type_lst = type_lst[::-1]
+            #flip_ids = [0,3]
     
         values = self.get_values(faces, idx_lst, type_lst)
-        values[0] = values[0][::-1]
-        values[2] = values[2][::-1]
         
+        for i in flip_ids:
+            values[i] = values[i][::-1]
+
         
         self.set_values(faces, idx_lst, type_lst, values)
 
@@ -204,10 +212,6 @@ class Cube:
             self.rotate_z(face, direction)
         
 
-            
-        
-
-        
     def rotate(self, face: str, direction: str):
         if face not in self.faces.keys():
             raise ValueError("face must be one of 'U', 'L', 'F', 'R', 'B', 'D'")
@@ -219,12 +223,10 @@ class Cube:
         
     def scramble(self):
         from random import choice
-        for _ in range(5):
+        for _ in range(100):
             face = choice(list(self.faces.keys()))
             direction = choice(['clockwise', 'counterclockwise'])
-            self.print_move(face, direction)
             self.rotate(face, direction)
-            print(self.__str__())
         
     def __str__(self):
         # print the net of the cube
@@ -247,22 +249,17 @@ if __name__ == "__main__":
     c = Cube()
     print(c)
     
-    for direction in ['clockwise', 'counterclockwise']:
-        for face in ['U', 'L', 'F', 'R', 'B', 'D']:
-            c = Cube()
-            file = open(f"tests/{face}-{direction}.txt", "w")
-            c.rotate(face, direction)
-            print(c, file=file)
+    
+    # for direction in ['clockwise', 'counterclockwise']:
+    #     for face in ['U', 'L', 'F', 'R', 'B', 'D']:
+    #         c = Cube()
+    #         file = open(f"tests/{face}-{direction}.txt", "w")
+    #         c.rotate(face, direction)
+    #         print(c, file=file)
 
 
-    #c.scramble()
-    # c.rotate('U', 'counterclockwise')
-    # print(c)
-    # c.rotate('D', 'clockwise')
-    # print(c)
-    # c.rotate('B', 'clockwise')
-    # print(c)
-    # c.rotate('R', 'counterclockwise')
+    c.scramble()
+
 
     print(c)
 

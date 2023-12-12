@@ -1,10 +1,10 @@
-         Y1|Y2|B3
-         Y4|Y5|B6
-         Y7|Y8|B9
-B1|B2|B3|R3|R6|R9|Y7|Y8|Y9|O1|O2|O3
-B4|B5|B6|R2|R5|R8|G4|G5|G6|O4|O5|O6
-W1|W2|W3|R1|R4|R7|G7|G8|G9|O7|O8|O9
-         G1|W2|W3
-         G4|W5|W6
-         G7|W8|W9
+         Y1|Y2|Y3
+         Y4|Y5|Y6
+         G1|G4|G7
+B1|B2|Y9|R3|R6|R9|W3|G2|G3|O1|O2|O3
+B4|B5|Y8|R2|R5|R8|W2|G5|G6|O4|O5|O6
+B7|B8|Y7|R1|R4|R7|W1|G8|G9|O7|O8|O9
+         B3|B6|B9
+         W4|W5|W6
+         W7|W8|W9
 
