@@ -99,7 +99,7 @@ EDGE_ADJACENCY = {
 
 class Cube:
     
-    def __init__(self):
+    def __init__(self, state: str = None):
         self.faces = {
             'U': Face(Color.YELLOW),
             'L': Face(Color.BLUE),
@@ -108,6 +108,8 @@ class Cube:
             'B': Face(Color.ORANGE),
             'D': Face(Color.WHITE)
         }
+        if state:
+            self.parse(state)
         
     def get_values(self, face_arr:list, index_arr:list, type_arr:list):
         out = []
@@ -147,7 +149,6 @@ class Cube:
         
         self.set_values(faces, idx_lst, type_lst, values)
     
-        
     def rotate_y(self, move:str, direction: str): # L,R
         type_lst = ['c','c','c','c']
         flip_ids = [0,-1]
@@ -169,7 +170,6 @@ class Cube:
         for i in flip_ids:
             values[i] = values[i][::-1]         
         self.set_values(faces, idx_lst, type_lst, values)
-        
         
     def rotate_z(self, move:str, direction: str): # F,B
         type_lst = ['r','c','r','c']
@@ -197,8 +197,6 @@ class Cube:
 
         
         self.set_values(faces, idx_lst, type_lst, values)
-
-
         
     def update_adjacent_faces(self, face: str, direction: str):
         if face not in self.faces.keys():
@@ -211,7 +209,6 @@ class Cube:
         elif face == 'F' or face == 'B':
             self.rotate_z(face, direction)
         
-
     def rotate(self, face: str, direction: str):
         if face not in self.faces.keys():
             raise ValueError("face must be one of 'U', 'L', 'F', 'R', 'B', 'D'")
@@ -221,13 +218,37 @@ class Cube:
     def print_move(self, face: str, direction: str):
         print(f"{face}{'`' if direction == 'counterclockwise' else ''}")
         
-    def scramble(self):
+    def scramble(self, max_moves: int = 5):
         from random import choice
-        for _ in range(100):
+        for _ in range(max_moves):
             face = choice(list(self.faces.keys()))
             direction = choice(['clockwise', 'counterclockwise'])
             self.rotate(face, direction)
-        
+
+    def stringify(self):
+        out = ""
+        for face in ['U', 'L', 'F', 'R', 'B', 'D']:
+            for row in self.faces[face].squares:
+                for square in row:
+                    out += square
+        return out
+    
+    def parse(self, input_str: str):
+        for face in ['U', 'L', 'F', 'R', 'B', 'D']:
+            for row in range(3):
+                for col in range(3):
+                    self.faces[face].squares[row][col] = input_str[0:2]
+                    input_str = input_str[2:]
+    
+    def is_solved(self):
+        for face in ['U', 'L', 'F', 'R', 'B', 'D']:
+            color = self.faces[face].color
+            for row in range(3):
+                for col in range(3):
+                    if self.faces[face].squares[row][col] != color.value + str((row * 3) + col + 1):
+                        return False
+        return True    
+            
     def __str__(self):
         # print the net of the cube
         out = ""
@@ -246,9 +267,8 @@ class Cube:
 
 
 if __name__ == "__main__":
-    c = Cube()
-    print(c)
-    
+    #c = Cube()
+    pass
     
     # for direction in ['clockwise', 'counterclockwise']:
     #     for face in ['U', 'L', 'F', 'R', 'B', 'D']:
@@ -258,8 +278,6 @@ if __name__ == "__main__":
     #         print(c, file=file)
 
 
-    c.scramble()
-
-
-    print(c)
+    #c.scramble()
+    #print(c)
 
