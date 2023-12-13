@@ -7,9 +7,19 @@ class Color(Enum):
     YELLOW = 'Y'
     WHITE = 'W'
     ORANGE = 'O'
+    
+COLOR_MAP = {
+    "U": Color.YELLOW,
+    "L": Color.BLUE,
+    "F": Color.RED,
+    "R": Color.GREEN,
+    "B": Color.ORANGE,
+    "D": Color.WHITE
+}
 
 class Face:
     def __init__(self, color: Color):
+        print(f"Initializing face with color {color.value}")
         self.color = color
         self.squares = [[f"{color.value}{(r * 3) + c + 1}" for c in range(3)] for r in range(3)]
         
@@ -80,22 +90,27 @@ class Cube:
         }
         if state:
             self.parse(state)
+    
+    def get_face(self, face: str):
+        if face not in self.faces.keys():
+            raise ValueError("face must be one of 'U', 'L', 'F', 'R', 'B', 'D'")
+        return self.faces[face]
         
     def get_values(self, face_arr:list, index_arr:list, type_arr:list):
         out = []
         for face, idx, type in zip(face_arr, index_arr, type_arr):
             if type == 'r':
-                out.append(self.faces[face].get_row(idx))
+                out.append(self.get_face(face).get_row(idx))
             else:
-                out.append(self.faces[face].get_column(idx))
+                out.append(self.get_face(face).get_column(idx))
         return self.shift_list(out)
     
     def set_values(self, face_arr:list, index_arr:list, type_arr:list, values:list):
         for face, idx, type, value in zip(face_arr, index_arr, type_arr, values):
             if type == 'r':
-                self.faces[face].set_row(idx, value)
+                self.get_face(face).set_row(idx, value)
             else:
-                self.faces[face].set_column(idx, value)
+                self.get_face(face).set_column(idx, value)
                 
     def shift_list(self, lst:list):
         lst.insert(0, lst.pop())
@@ -182,7 +197,7 @@ class Cube:
     def rotate(self, face: str, direction: str):
         if face not in self.faces.keys():
             raise ValueError("face must be one of 'U', 'L', 'F', 'R', 'B', 'D'")
-        self.faces[face].rotate(direction)
+        self.get_face(face).rotate(direction)
         self.update_adjacent_faces(face, direction)
 
     def print_move(self, face: str, direction: str):
@@ -198,7 +213,7 @@ class Cube:
     def stringify(self):
         out = ""
         for face in ['U', 'L', 'F', 'R', 'B', 'D']:
-            for row in self.faces[face].squares:
+            for row in self.get_face(face).squares:
                 for square in row:
                     out += square
         return out
@@ -207,15 +222,15 @@ class Cube:
         for face in ['U', 'L', 'F', 'R', 'B', 'D']:
             for row in range(3):
                 for col in range(3):
-                    self.faces[face].squares[row][col] = input_str[0:2]
+                    self.get_face(face).squares[row][col] = input_str[0:2]
                     input_str = input_str[2:]
     
     def is_solved(self):
         for face in ['U', 'L', 'F', 'R', 'B', 'D']:
-            color = self.faces[face].color
+            color = self.get_face(face).color
             for row in range(3):
                 for col in range(3):
-                    if self.faces[face].squares[row][col] != color.value + str((row * 3) + col + 1):
+                    if self.get_face(face).squares[row][col] != color.value + str((row * 3) + col + 1):
                         return False
         return True    
             

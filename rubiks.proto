@@ -8,24 +8,28 @@ service RubiksMessaging {
 
     rpc GetRow(Index) returns (SquareTriple) {}
 
-    rpc SetColumn(Index, SquareTriple) returns (Ack) {}
+    rpc SetColumn(SquareTriple) returns (Ack) {}
 
-    rpc SetRow(Index, SquareTriple) returns (Ack) {}
+    rpc SetRow(SquareTriple) returns (Ack) {}
 
     rpc Rotate(Direction) returns (Ack) {}
 
 }
 
-enum Directions {
-    CLOCKWISE = 'clockwise';
-    COUNTERCLOCKWISE = 'counterclockwise';
+message Direction {
+    string direction = 1;
 }
 
 message Index {
-    int32 index = 0;
+    int32 index = 1;
 }
 
-
+message SquareTriple {
+    int32 index = 1;
+    string square1 = 2;
+    string square2 = 3;
+    string square3 = 4;
+}
 
 message Ack {
     int32 status = 1;
